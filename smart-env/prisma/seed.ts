@@ -5,11 +5,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Seeding database...");
 
-  // ── Delete existing products (preserves users/orders) ─────────
-  await prisma.cartItem.deleteMany();
-  await prisma.orderItem.deleteMany();
-  await prisma.order.deleteMany();
-  await prisma.product.deleteMany();
+  // ── Products are upserted below to preserve existing orders/carts ─────────
 
   // ── SENSORS ───────────────────────────────────────────────────
   const sensors = [
