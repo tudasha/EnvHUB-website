@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import type { AIRecommendation } from "@/types";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -7,6 +8,15 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(request: NextRequest) {
   try {
+    // ── Auth guard ──────────────────────────────────────────────
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: "You must be logged in to use the AI assistant." },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const query: string = body.query ?? "";
 

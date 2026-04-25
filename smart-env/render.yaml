@@ -5,7 +5,7 @@ services:
     region: frankfurt  # cea mai apropiata de Romania
     plan: free
     rootDir: .          # render.yaml se afla in smart-env/, deci root e chiar aici
-    buildCommand: npm install && npx prisma generate && npm run build
+    buildCommand: npm install && npx prisma generate && npx prisma db push && npm run seed && npm run build
     startCommand: npm run start
     envVars:
       - key: NODE_ENV
