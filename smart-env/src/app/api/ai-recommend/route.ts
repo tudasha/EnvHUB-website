@@ -70,7 +70,7 @@ Respond ONLY with a valid JSON object adhering strictly to the following structu
 Only include slugs that exist in the provided catalog.
 `;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();
     
