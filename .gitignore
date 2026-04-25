@@ -1,0 +1,12 @@
+# root environment files
+.env
+.env.local
+.env.production
+.env.development
+
+# node_modules and other standard ignores in case they exist here
+node_modules/
+.DS_Store
+
+# (Optional) Since smart-env has its own .gitignore, you don't necessarily need to duplicate it, 
+# but it's good to keep the root safe.
