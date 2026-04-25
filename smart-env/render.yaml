@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: envhub-website
+    runtime: node
+    region: frankfurt  # cea mai apropiata de Romania
+    plan: free
+    rootDir: .          # render.yaml se afla in smart-env/, deci root e chiar aici
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false       # va fi setat manual in Render dashboard
+      - key: AUTH_SECRET
+        generateValue: true   # Render genereaza automat un secret random
+      - key: NEXTAUTH_URL
+        sync: false       # va fi setat cu URL-ul Render dupa deploy (ex: https://envhub-website.onrender.com)
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false       # acelasi URL ca NEXTAUTH_URL
