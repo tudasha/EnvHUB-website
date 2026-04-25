@@ -58,9 +58,18 @@ export function HeroAI() {
         body: JSON.stringify({ query }),
       });
 
-      if (!res.ok) throw new Error("Failed to get recommendation");
-      const data: AIRecommendation = await res.json();
-      setResult(data);
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          setError("You must be logged in to use the AI assistant. Please sign in.");
+        } else {
+          setError(data?.error ?? "Something went wrong. Please try again.");
+        }
+        return;
+      }
+
+      setResult(data as AIRecommendation);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
