@@ -70,7 +70,7 @@ Respond ONLY with a valid JSON object adhering strictly to the following structu
 Only include slugs that exist in the provided catalog.
 `;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();
     
@@ -100,8 +100,9 @@ Only include slugs that exist in the provided catalog.
     return NextResponse.json(recommendation);
   } catch (error) {
     console.error("[AI_RECOMMEND_GEMINI]", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to generate recommendation. Please try again." },
+      { error: `Failed to generate recommendation. Details: ${errorMessage}` },
       { status: 500 }
     );
   }
