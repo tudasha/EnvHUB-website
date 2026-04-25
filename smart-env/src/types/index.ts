@@ -19,7 +19,7 @@ export interface ProductWithCategory {
 export interface CartItemWithProduct {
   id: string;
   quantity: number;
-  userId: string;
+  userId: number;
   productId: string;
   product: ProductWithCategory;
 }
@@ -28,7 +28,7 @@ export interface OrderWithItems {
   id: string;
   status: OrderStatus;
   total: number;
-  userId: string;
+  userId: number;
   address: string | null;
   createdAt: Date;
   items: OrderItemWithProduct[];
