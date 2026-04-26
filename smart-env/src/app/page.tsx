@@ -1,6 +1,7 @@
 import { HeroAI } from "@/components/home/HeroAI";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { ProjectDescription } from "@/components/home/ProjectDescription";
+import { CompetitorComparison } from "@/components/home/CompetitorComparison";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { Suspense } from "react";
 
@@ -9,6 +10,7 @@ export default function HomePage() {
     <>
       <HeroAI />
       <ProjectDescription />
+      <CompetitorComparison />
       <HowItWorks />
       <Suspense fallback={
         <div className="py-24 px-4 border-t border-white/5">
@@ -27,4 +29,5 @@ export default function HomePage() {
     </>
   );
 }
+
 
