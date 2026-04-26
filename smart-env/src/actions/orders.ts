@@ -64,10 +64,13 @@ export async function checkoutAction(
 
       cartItems.forEach((item: any) => {
         const tags = item.product.tags || [];
-        if (tags.some((t: string) => ['weather', 'climate', 'temperature', 'humidity'].includes(t))) newModules.add('weather');
+        if (tags.some((t: string) => ['weather', 'forecast'].includes(t))) newModules.add('weather');
+        if (tags.some((t: string) => ['climate', 'temperature', 'humidity'].includes(t))) newModules.add('indoor_climate');
         if (tags.some((t: string) => ['energy', 'power'].includes(t))) newModules.add('energy');
         if (tags.some((t: string) => ['health', 'fitness', 'heart'].includes(t))) newModules.add('health');
-        if (tags.some((t: string) => ['security', 'motion', 'door', 'camera', 'safe'].includes(t))) newModules.add('security');
+        if (tags.some((t: string) => ['security', 'door', 'camera', 'safe'].includes(t))) newModules.add('security');
+        if (tags.some((t: string) => ['motion', 'pir'].includes(t))) newModules.add('indoor_motion');
+        if (tags.some((t: string) => ['light', 'lux'].includes(t))) newModules.add('indoor_light');
         if (tags.some((t: string) => ['water', 'leak', 'flood'].includes(t))) newModules.add('water');
         if (tags.some((t: string) => ['solar'].includes(t))) newModules.add('solar');
       });
