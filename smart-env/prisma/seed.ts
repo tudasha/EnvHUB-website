@@ -258,8 +258,21 @@ async function main() {
     },
   ];
 
-  // ── DEVICES / APPS ─────────────────────────────────────────────
+  // ── DEVICES / APPS / VIRTUAL SERVICES ─────────────────────────────
   const devices = [
+    {
+      name: "Weather Forecast Service",
+      slug: "weather-forecast-service",
+      description:
+        "Virtual weather service integration. Pulls real-time localized weather data and 7-day forecasts directly into your EnvHUB dashboard. Enables automations like stopping irrigation if rain is forecasted.",
+      price: 9.99,
+      imageUrl:
+        "https://images.unsplash.com/photo-1561553873-e8491a564fd0?w=600",
+      category: Category.HUB,
+      stock: 9999,
+      tags: ["weather", "forecast", "virtual", "service", "software"],
+      featured: true,
+    },
     {
       name: "Core4Health App",
       slug: "core4health-app",
