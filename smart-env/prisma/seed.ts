@@ -261,6 +261,19 @@ async function main() {
   // ── DEVICES / APPS / VIRTUAL SERVICES ─────────────────────────────
   const devices = [
     {
+      name: "EnvHUB Gateway",
+      slug: "envhub-gateway",
+      description:
+        "The brain of your smart environment. EnvHUB Gateway is the central hub that connects, manages, and orchestrates all your sensors and actuators. Supports Wi-Fi, Zigbee, and Z-Wave protocols. Required for all sensor integrations. Includes local processing, cloud sync, and the full EnvHUB app ecosystem.",
+      price: 89.99,
+      imageUrl:
+        "https://images.unsplash.com/photo-1558618047-f2a26c4f022d?w=600",
+      category: Category.HUB,
+      stock: 500,
+      tags: ["hub", "gateway", "central", "required", "envhub", "zigbee", "wifi"],
+      featured: true,
+    },
+    {
       name: "Weather Forecast Service",
       slug: "weather-forecast-service",
       description:

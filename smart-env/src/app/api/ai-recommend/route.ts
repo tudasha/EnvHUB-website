@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import type { AIRecommendation } from "@/types";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || "",
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,8 +29,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!process.env.GEMINI_API_KEY) {
-      console.warn("GEMINI_API_KEY is not set. Returning fallback data.");
+    if (!process.env.OPENAI_API_KEY) {
+      console.warn("OPENAI_API_KEY is not set. Returning fallback data.");
       return generateFallback(query);
     }
 
@@ -53,6 +55,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Fetch user orders to check if they own a HUB
+    let hasBoughtHub = false;
+    try {
+      const userId = Number(session.user.id);
+      if (!isNaN(userId)) {
+        const userOrders = await prisma.order.findMany({
+          where: { userId },
+          include: { items: { include: { product: true } } },
+        });
+        hasBoughtHub = userOrders.some((order) =>
+          order.items.some((item) => item.product.category === "HUB")
+        );
+      }
+    } catch (e) {
+      console.error("Failed to check user orders:", e);
+    }
+
     const prompt = `
 You are an expert Smart Home and Smart Farming IoT assistant.
 A user wants a hardware recommendation based on the following input: "${query}"
@@ -61,6 +80,12 @@ Here is our available catalog:
 ${JSON.stringify(catalog, null, 2)}
 
 Your task is to recommend a curated package of hardware from the catalog that best solves the user's problem.
+
+CRITICAL INSTRUCTIONS:
+1. Select components, sensors, and apps that have a direct connection with the user's request.
+2. Ownership status: The user has ${hasBoughtHub ? 'ALREADY PURCHASED' : 'NOT PURCHASED'} a HUB.
+3. ${!hasBoughtHub ? 'Because the user does not own a HUB, you MUST include a HUB product (category: "HUB") in your recommended package. This is mandatory for new users or first-time buyers.' : 'Since the user already owns a HUB, do NOT include a HUB in the package unless their prompt explicitly asks for another one.'}
+
 Respond ONLY with a valid JSON object adhering strictly to the following structure. Do not include markdown formatting like \`\`\`json.
 {
   "packageName": "A creative, short name for the bundle (e.g. 'Kit Monitorizare Aer')",
@@ -70,9 +95,13 @@ Respond ONLY with a valid JSON object adhering strictly to the following structu
 Only include slugs that exist in the provided catalog.
 `;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" }
+    });
+
+    const responseText = completion.choices[0]?.message?.content || "{}";
     
     // Clean markdown if present
     const cleanJson = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
@@ -82,6 +111,18 @@ Only include slugs that exist in the provided catalog.
       description: string;
       productSlugs: string[];
     };
+
+    // Ensure EnvHUB Gateway is always included for new users
+    if (!hasBoughtHub) {
+      const includesHub = catalog.some(p => p.category === "HUB" && aiResponse.productSlugs.includes(p.slug));
+      if (!includesHub) {
+        // Prefer the physical gateway; fall back to any HUB category item
+        const physicalHub = catalog.find(p => p.slug === "envhub-gateway") ?? catalog.find(p => p.category === "HUB");
+        if (physicalHub) {
+          aiResponse.productSlugs.unshift(physicalHub.slug); // put it first
+        }
+      }
+    }
 
     // Fetch the actual products based on recommended slugs
     const recommendedProducts = await prisma.product.findMany({
@@ -99,7 +140,7 @@ Only include slugs that exist in the provided catalog.
 
     return NextResponse.json(recommendation);
   } catch (error) {
-    console.error("[AI_RECOMMEND_GEMINI]", error);
+    console.error("[AI_RECOMMEND_OPENAI]", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
       { error: `Failed to generate recommendation. Details: ${errorMessage}` },
@@ -118,7 +159,7 @@ async function generateFallback(query: string) {
     const totalPrice = fallbackProducts.reduce((sum, p) => sum + p.price, 0);
     return NextResponse.json({
       packageName: "Starter Pack (Fallback)",
-      description: "Gemini API key is missing. Showing featured products.",
+      description: "OPENAI_API_KEY is missing. Showing featured products.",
       products: fallbackProducts,
       totalPrice,
     });
