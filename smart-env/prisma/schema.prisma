@@ -22,8 +22,14 @@ model User {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
 
-  orders    Order[]
-  cartItems CartItem[]
+  orders         Order[]
+  cartItems      CartItem[]
+  sensorReadings SensorReading[]
+  aiMessages     AiMessage[]
+  communityHubs  CommunityHub[]
+  calendarEvents CalendarEvent[]
+  healthSteps    HealthStep[]
+  healthMeals    HealthMeal[]
 
   @@map("users")
 }
@@ -107,4 +113,85 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+}
+
+model SensorReading {
+  id         Int      @id @default(autoincrement())
+  userId     Int?     @map("user_id")
+  sensorType String   @map("sensor_type")
+  value      Float?
+  unit       String?
+  recordedAt DateTime @default(now()) @map("recorded_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("sensor_readings")
+}
+
+model AiMessage {
+  id        Int      @id @default(autoincrement())
+  userId    Int?     @map("user_id")
+  role      String
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("ai_messages")
+}
+
+model CommunityHub {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  name      String
+  ownerId   Int?     @map("owner_id")
+  members   Json?    @default("[]")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  owner User? @relation(fields: [ownerId], references: [id])
+
+  @@map("community_hubs")
+}
+
+model CalendarEvent {
+  id          Int       @id @default(autoincrement())
+  userId      Int?      @map("user_id")
+  title       String
+  description String?
+  startTime   DateTime? @map("start_time")
+  endTime     DateTime? @map("end_time")
+  color       String?   @default("#6366f1")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("calendar_events")
+}
+
+model HealthStep {
+  id         Int      @id @default(autoincrement())
+  userId     Int?     @map("user_id")
+  steps      Int      @default(0)
+  goal       Int      @default(10000)
+  recordedAt DateTime @default(now()) @map("recorded_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("health_steps")
+}
+
+model HealthMeal {
+  id         Int      @id @default(autoincrement())
+  userId     Int?     @map("user_id")
+  name       String
+  icon       String?  @default("🍽️")
+  calories   Float?   @default(0)
+  protein    Float?   @default(0)
+  carbs      Float?   @default(0)
+  fat        Float?   @default(0)
+  mealType   String?  @default("snack") @map("meal_type")
+  recordedAt DateTime @default(now()) @map("recorded_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("health_meals")
 }
