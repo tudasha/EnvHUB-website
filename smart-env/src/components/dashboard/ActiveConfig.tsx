@@ -71,6 +71,13 @@ export function ActiveConfig({ orders }: ActiveConfigProps) {
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                 <span className="text-[10px] text-green-500">Online</span>
               </div>
+              {product.slug === "core4health-app" && (
+                <a href="/core4health/app-debug.apk" download className="mt-2 w-full">
+                  <Button size="sm" className="w-full bg-green-500 hover:bg-green-600 text-black text-[10px] h-7">
+                    Download APK
+                  </Button>
+                </a>
+              )}
             </div>
           ))}
         </div>
